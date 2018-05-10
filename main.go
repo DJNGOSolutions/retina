@@ -9,9 +9,9 @@ import (
 	"github.com/pdmp/retina/models"
 )
 
-func main() {
-	app := iris.New()
+func newApp() *iris.Application {
 
+	app := iris.New()
 	orm, err := xorm.NewEngine("postgres", "dbname=retina_dev user=postgres password=root sslmode=disable")
 	if err != nil {
 		app.Logger().Fatalf("orm failed to initialized: %v", err)
@@ -26,6 +26,14 @@ func main() {
 	if err != nil {
 		app.Logger().Fatalf("orm failed to initialized User table: %v", err)
 	}
+
+	app.RegisterView(iris.HTML("./public/lens/dist/lens", ".html"))
+	app.Get("/", func(ctx iris.Context) {
+		ctx.View("index.html")
+	})
+
+	assetHandler := app.StaticHandler("./public/lens/dist/lens", false, false)
+	app.SPA(assetHandler)
 
 	pass, _ := models.GeneratePassword("haha")
 	app.Get("/insert", func(ctx iris.Context) {
@@ -42,5 +50,11 @@ func main() {
 		}
 	})
 
-	app.Run(iris.Addr(":8000"))
+	return app
+}
+
+func main() {
+	app := newApp()
+
+	app.Run(iris.Addr("localhost:8000"))
 }
