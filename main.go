@@ -27,12 +27,12 @@ func newApp() *iris.Application {
 		app.Logger().Fatalf("orm failed to initialized User table: %v", err)
 	}
 
-	app.RegisterView(iris.HTML("./public/lens/dist/lens", ".html"))
+	app.RegisterView(iris.HTML("./public/lens/", ".html"))
 	app.Get("/", func(ctx iris.Context) {
 		ctx.View("index.html")
 	})
 
-	assetHandler := app.StaticHandler("./public/lens/dist/lens", false, false)
+	assetHandler := app.StaticHandler("./public/lens/", false, false)
 	app.SPA(assetHandler)
 
 	pass, _ := models.GeneratePassword("haha")
